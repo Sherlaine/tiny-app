@@ -16,15 +16,19 @@
     </h1>
     <ul>
         <% for (const shortURL in urls){ %>
-        <a href="#">
-            <li>
-                <%= urls[shortURL]%>
-            </li>
-        </a>
-        <%= shortURL%>
+        <li>           
+            <%= shortURL%> --> 
+            <%= urls[shortURL]%>
+        <a href ="/urls/<%=shortURL%>" >Edit</a> 
+        <form method= "POST" action="/urls/<%= shortURL %>/delete">
+            <br>
+        <button type = "submit">Delete</button>
+        </form>
+        </li>
+      
         <% } %>
     </ul>
 
-    </body>
+</body>
 
 </html>

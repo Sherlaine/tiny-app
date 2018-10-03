@@ -63,11 +63,30 @@ app.post("/urls", (req, res) => {
     // res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
+// deletes the link page
+app.post("/urls/:id/delete", (req, res) =>{
+    delete urlDatabase[req.params.id] 
+    res.redirect('/urls/');
+})
+
+
+app.post("/urls/:id", (req, res) =>{
+    res.redirect('/urls/new');
+})
+
+app.post("/urls/:id/update", (req, res) =>{
+    var shortURL = req.params.id 
+    urlDatabase[shortURL] = req.body.newLongURL;
+
+    res.redirect('/urls');
+    //we are updating the the request link long URL 
+})
 
 app.get("/urls/:id", (req, res) => {
     console.log("inside id");
     let templateVars = {
-        longURL: urlDatabase[req.params.id]
+        longURL: urlDatabase[req.params.id],
+        shortURL: req.params.id
     };
     res.render("urls_show", templateVars);
     console.log(templateVars)

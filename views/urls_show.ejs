@@ -11,18 +11,24 @@
 
 <body class="container">
 
-   
+
     <h1>
+        Show my URLS
     </h1>
     <ol>
         <a href=>
             <li>
-                hello
+                Link:
                 <%= longURL%>
             </li>
         </a>
+
+        <form method="POST" action="/urls/<%=shortURL%>/update">
+            <input type="text" value="<%=longURL%>" placeholder="http://" style="width: 300px" name="newLongURL">
+            <button type="submit">Update</button>
+        </form>
     </ol>
 
-    </body>
+</body>
 
 </html>
