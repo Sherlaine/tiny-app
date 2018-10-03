@@ -8,6 +8,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 function generateRandomString() {
+      //Solution from https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
     var text = '';
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
 
@@ -17,7 +18,7 @@ function generateRandomString() {
 
     return text;
 }
-console.log(generateRandomString());
+// console.log(generateRandomString());
 
 var urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
@@ -49,18 +50,19 @@ app.get("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
     res.render("urls_new");
-    redirect: " "
 });
 
 app.post("/urls", (req, res) => {
-    console.log(req.body); // debug statement to see POST parameters
-    res.send("Ok"); // Respond with 'Ok' (we will replace this)
+    var id = generateRandomString();
+    urlDatabase[id] = req.body.longURL;
+
+    res.redirect('/urls/'+id);
+
+    console.log(urlDatabase);
+    // console.log(req.body); // debug statement to see POST parameters
+    // res.send("Ok"); // Respond with 'Ok' (we will replace this)
 });
 
-app.get("/u/:shortURL", (req, res) => {
-    // let longURL = ...
-    res.redirect(longURL);
-});
 
 app.get("/urls/:id", (req, res) => {
     console.log("inside id");
@@ -69,4 +71,12 @@ app.get("/urls/:id", (req, res) => {
     };
     res.render("urls_show", templateVars);
     console.log(templateVars)
+});
+
+app.get("/u/:shortURL", (req, res) => {
+
+    let shortURL = req.params.shortURL;
+    console.log(shortURL);
+    let longURL = urlDatabase[shortURL];
+    res.redirect(longURL);
 });
