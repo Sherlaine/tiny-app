@@ -3,6 +3,8 @@
 <!-- //if you do have that name already it will display that name
 //it will also display a log out
 // otherwise display your username entry bar - blank  -->
+<a href='/registration'>registration</a>
+
 <% if(username){ %>
     <%= username %>
     <form method="POST" action="/logout">
@@ -14,6 +16,7 @@
         <button type="submit">Login</button>
     </form>
  <% } %>
+
             
 
    

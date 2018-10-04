@@ -8,7 +8,7 @@ app.use(cookieParser())
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({
     extended: true
-    
+
 }));
 
 //this if for our random string generator
@@ -20,7 +20,6 @@ function generateRandomString() {
     for (var i = 0; i < 6; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
-
     return text;
 }
 
@@ -80,7 +79,6 @@ app.get("/urls/:id", (req, res) => {
         longURL: urlDatabase[req.params.id],
         shortURL: req.params.id,
         username: req.cookies["username"]
-
     };
     res.render("urls_show", templateVars);
     console.log(templateVars)
@@ -92,14 +90,16 @@ app.post("/login", (req, res) => {
     res.cookie("username", req.body.username);
     res.redirect('/urls');
 })
-app.post("/logout", (req, res)=>{
+app.post("/logout", (req, res) => {
     res.clearCookie("username");
     res.redirect('/urls')
 })
-app.get("/login", (req, res)=>{
+app.get("/login", (req, res) => {
     res.cookie("username", req.body.username);
     res.redirect('/urls')
 })
+
+//when we get the new id we redirect to new
 app.post("/urls/:id", (req, res) => {
     res.redirect('/urls/new');
 })
@@ -107,10 +107,22 @@ app.post("/urls/:id", (req, res) => {
 app.post("/urls/:id/update", (req, res) => {
     var shortURL = req.params.id
     urlDatabase[shortURL] = req.body.newLongURL;
-
     res.redirect('/urls');
     //we are updating the the request link long URL 
 })
+
+//create a registration page
+app.get("/registration", (req, res) => {  
+      let templateVar = {
+    username: req.cookies["username"]
+};
+    res.render('registration',templateVar); 
+})
+
+// app.post("/registration", (req, res) =>{
+//     console.log(req.body.newUsername)
+//     res.redirect('/urls')
+// })
 
 
 app.get("/u/:shortURL", (req, res) => {
@@ -120,8 +132,3 @@ app.get("/u/:shortURL", (req, res) => {
     let longURL = urlDatabase[shortURL];
     res.redirect(longURL);
 });
-
-// let templateVars = {
-//     username: req.cookies["username"],
-//     // ... any other vars
-//   };
