@@ -1,17 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
+        <% include partials/_head %>
 
-<head>
-    <% include partials/_header %>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>TinyApp</title>
-</head>
+
 
 <body class="container">
 
-
+        <% include partials/_header %>
     <h1>
         Show my URLS
     </h1>
@@ -22,9 +17,9 @@
                 <%= longURL%>
             </li>
         </a>
-
+ <!-- this is the url update form  -->
         <form method="POST" action="/urls/<%=shortURL%>/update">
-            <input type="text" value="<%=longURL%>" placeholder="http://" style="width: 300px" name="newLongURL">
+            <input type="text" placeholder="http://" style="width: 300px" name="newLongURL">
             <button type="submit">Update</button>
         </form>
     </ol>
