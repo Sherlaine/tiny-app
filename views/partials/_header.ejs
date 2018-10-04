@@ -1,8 +1,19 @@
 
-
-            <form method="POST" action="/login">
-                <input type="text" placeholder="username" style="width: 300px" name="username">
-                <button type="submit">Submit</button>
-            </form>
+            
+<!-- //if you do have that name already it will display that name
+//it will also display a log out
+// otherwise display your username entry bar - blank  -->
+<% if(username){ %>
+    <%= username %>
+    <form method="POST" action="/logout">
+        <button type="submit">Logout</button>
+    </form>
+  <% } else{ %>  
+    <form method="POST" action="/login">
+        <input type="text" placeholder="username" style="width: 300px" name="username">
+        <button type="submit">Login</button>
+    </form>
+ <% } %>
+            
 
    
