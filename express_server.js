@@ -5,6 +5,21 @@ app.set("view engine", "ejs");
 var cookieParser = require('cookie-parser')
 app.use(cookieParser())
 
+//User Object 
+const users = { 
+    "userRandomID": {
+      id: "userRandomID", 
+      email: "user@example.com", 
+      password: "purple-monkey-dinosaur"
+    },
+   "user2RandomID": {
+      id: "user2RandomID", 
+      email: "user2@example.com", 
+      password: "dishwasher-funk"
+    }
+  }
+
+
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({
     extended: true
@@ -112,16 +127,47 @@ app.post("/urls/:id/update", (req, res) => {
 })
 
 //create a registration page
-app.get("/registration", (req, res) => {  
-      let templateVar = {
+app.get("/register", (req, res) => {  
+    let templateVar = {
     username: req.cookies["username"]
 };
-    res.render('registration',templateVar); 
+    res.render('register',templateVar); 
 })
 
-// app.post("/registration", (req, res) =>{
-//     console.log(req.body.newUsername)
-//     res.redirect('/urls')
+app.post("/register", (req, res) =>{
+//assigning our email and password variable with the user's inuput of email and password
+    let email = req.body.email 
+    let password = req.body.password
+//we are making a newUSER ID by generating a random string 
+    let newUserID = generateRandomString()
+//we need to add these variables to our user object however, we can't push so we are making a new object. 
+    users[newUserID] = {
+        id: newUserID,
+        email: email,
+        password: password
+    }
+    console.log(users)
+    res.redirect('/urls')
+})
+
+// app.post("/register", (req, res) =>{
+//  const username = req.body.username;
+//   const password = req.body.password;
+
+//   const user = checkClearLogin(username, password);
+
+//   if (user) {
+//     // success
+//     // cookies set to expire in 1 hour
+//     res.cookie('username', user.username, {expires: new Date(Date.now() + 1000*60*60)}); // Set-Cookie: lang=en
+//     res.cookie('password', user.password, {expires: new Date(Date.now() + 1000*60*60)}); // Set-Cookie: lang=en
+
+//     res.redirect('/urls');
+//   } else {
+//     // failed attempt
+//     res.render('login', { errorFeedback: 'Failed to find a user.' });
+//   }
+//   console.log(`You attempted to log in with ${username}. User: ${user && user.username}`);
 // })
 
 
