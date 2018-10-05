@@ -6,18 +6,18 @@ var cookieParser = require('cookie-parser')
 app.use(cookieParser())
 
 //User Object 
-const users = { 
+const users = {
     "userRandomID": {
-      id: "userRandomID", 
-      email: "user@example.com", 
-      password: "purple-monkey-dinosaur"
+        id: "userRandomID",
+        email: "user@example.com",
+        password: "purple-umonkey-dinosar"
     },
-   "user2RandomID": {
-      id: "user2RandomID", 
-      email: "user2@example.com", 
-      password: "dishwasher-funk"
+    "user2RandomID": {
+        id: "user2RandomID",
+        email: "user2@example.com",
+        password: "dishwasher-funk"
     }
-  }
+}
 
 
 const bodyParser = require("body-parser");
@@ -127,25 +127,36 @@ app.post("/urls/:id/update", (req, res) => {
 })
 
 //create a registration page
-app.get("/register", (req, res) => {  
+app.get("/register", (req, res) => {
     let templateVar = {
-    username: req.cookies["username"]
-};
-    res.render('register',templateVar); 
+        username: req.cookies["username"]
+    };
+    res.render('register', templateVar);
 })
 
-app.post("/register", (req, res) =>{
-//assigning our email and password variable with the user's inuput of email and password
-    let email = req.body.email 
-    let password = req.body.password
-//we are making a newUSER ID by generating a random string 
-    let newUserID = generateRandomString()
-//we need to add these variables to our user object however, we can't push so we are making a new object. 
+app.post("/register", (req, res) => {
+    //assigning our email and password variable with the user's inuput of email and password
+    let email = req.body.email;
+    let password = req.body.password;
+    //we are making a newUSER ID by generating a random string 
+    let newUserID = generateRandomString();
     users[newUserID] = {
         id: newUserID,
         email: email,
         password: password
     }
+    if (!req.body.email || !req.body.password) {
+        console.log("400 need something in here")
+        res.status(400).send("Please supply email and password");
+    }
+    for (let i in users) {
+        if (users[newUserID].email === users[i].email) {
+        res.status(400).send("Existing user email, please register")
+    }
+}
+    // we need to add these variables to our user object however, we can't push so we are making a new object. 
+   
+    res.cookie("user_id", req.body.newUserID);
     console.log(users)
     res.redirect('/urls')
 })
