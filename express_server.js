@@ -19,7 +19,6 @@ const users = {
     }
 }
 
-
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({
     extended: true
@@ -62,14 +61,14 @@ app.get("/hello", (req, res) => {
 app.get("/urls", (req, res) => {
     let templateVars = {
         urls: urlDatabase,
-        username: req.cookies["username"]
+        users: users[req.cookies["user_id"]]
     };
     res.render("urls_index", templateVars);
 })
 
 app.get("/urls/new", (req, res) => {
-    let templateVar = {
-        username: req.cookies["username"]
+    let templateVars = {
+        users: users[req.cookies["user_id"]]
     }
     res.render("urls_index", templateVars)
 });
@@ -93,26 +92,25 @@ app.get("/urls/:id", (req, res) => {
     let templateVars = {
         longURL: urlDatabase[req.params.id],
         shortURL: req.params.id,
-        username: req.cookies["username"]
+        users: users[req.cookies["user_id"]]
     };
     res.render("urls_show", templateVars);
-    console.log(templateVars)
 });
 
 //cookie function
 
 app.post("/login", (req, res) => {
-    res.cookie("username", req.body.username);
+    // res.cookie("user_id", req.body.user_id);
     res.redirect('/urls');
 })
 app.post("/logout", (req, res) => {
-    res.clearCookie("username");
+    res.clearCookie("user_id");
     res.redirect('/urls')
 })
-app.get("/login", (req, res) => {
-    res.cookie("username", req.body.username);
-    res.redirect('/urls')
-})
+// app.get("/login", (req, res) => {
+//     res.cookie("user_id", req.body.user_id);
+//     res.redirect('/urls')
+// })
 
 //when we get the new id we redirect to new
 app.post("/urls/:id", (req, res) => {
@@ -128,59 +126,53 @@ app.post("/urls/:id/update", (req, res) => {
 
 //create a registration page
 app.get("/register", (req, res) => {
-    let templateVar = {
-        username: req.cookies["username"]
+    let templateVars = {
+        users: users[req.cookies["user_id"]]
     };
-    res.render('register', templateVar);
+    res.render('register', templateVars);
 })
-
 app.post("/register", (req, res) => {
     //assigning our email and password variable with the user's inuput of email and password
     let email = req.body.email;
     let password = req.body.password;
-    //we are making a newUSER ID by generating a random string 
     let newUserID = generateRandomString();
+
+    //we are making a newUSER ID by generating a random string 
+    for (let property in users) {
+        if (email === users[property].email) {
+            res.status(400).send("Existing user email, please register")
+            return
+        }
+    }
+
+    if (!email || !password) {
+        console.log("400 need something in here")
+        res.status(400).send("Please supply email and password");
+        return
+    }
     users[newUserID] = {
         id: newUserID,
         email: email,
         password: password
     }
-    if (!req.body.email || !req.body.password) {
-        console.log("400 need something in here")
-        res.status(400).send("Please supply email and password");
-    }
-    for (let i in users) {
-        if (users[newUserID].email === users[i].email) {
-        res.status(400).send("Existing user email, please register")
-    }
-}
+
     // we need to add these variables to our user object however, we can't push so we are making a new object. 
-   
-    res.cookie("user_id", req.body.newUserID);
+
+    res.cookie("user_id", newUserID);
     console.log(users)
     res.redirect('/urls')
 })
 
-// app.post("/register", (req, res) =>{
-//  const username = req.body.username;
-//   const password = req.body.password;
+//login page
 
-//   const user = checkClearLogin(username, password);
+app.get("/login", (req, res)=> {
+res.render("login"); 
+});
 
-//   if (user) {
-//     // success
-//     // cookies set to expire in 1 hour
-//     res.cookie('username', user.username, {expires: new Date(Date.now() + 1000*60*60)}); // Set-Cookie: lang=en
-//     res.cookie('password', user.password, {expires: new Date(Date.now() + 1000*60*60)}); // Set-Cookie: lang=en
-
-//     res.redirect('/urls');
-//   } else {
-//     // failed attempt
-//     res.render('login', { errorFeedback: 'Failed to find a user.' });
-//   }
-//   console.log(`You attempted to log in with ${username}. User: ${user && user.username}`);
-// })
-
+app.post("/login", (req, res) => {
+    // let email = req.body.email;
+    // let password = req.body.password;
+})
 
 app.get("/u/:shortURL", (req, res) => {
 

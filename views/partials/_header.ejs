@@ -1,18 +1,14 @@
 
-            
-<!-- //if you do have that name already it will display that name
-//it will also display a log out
-// otherwise display your username entry bar - blank  -->
 <a href='/register'>register</a>
 
-<% if(username){ %>
-    <%= username %>
+<% if(users){ %>
+    <p><%= users["email"] %></p>
     <form method="POST" action="/logout">
         <button type="submit">Logout</button>
     </form>
   <% } else{ %>  
     <form method="POST" action="/login">
-        <input type="text" placeholder="username" style="width: 300px" name="username">
+        <input type="text" placeholder="login" style="width: 300px" name="user_id">
         <button type="submit">Login</button>
     </form>
  <% } %>
