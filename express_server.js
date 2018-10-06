@@ -25,7 +25,7 @@ const users = {
 //--------------------------databases
 let urlDatabase = {
     "b2xVn2": {
-        userId: "userRandomID"
+        userId: "userRandomID",
         longURL: "http://www.lighthouselabs.ca",
     },
 
@@ -57,7 +57,7 @@ function generateRandomString() {
 
 // ---------------------------- Paths 
 app.get("/", (req, res) => {
-    res.redirect('/urls');
+    res.redirect('/login');
 });
 
 
@@ -79,17 +79,21 @@ app.get("/urls", (req, res) => {
 
 //------------------------------- Random URL to database 
 app.post("/urls", (req, res) => {
-    var id = generateRandomString();
-    urlDatabase[id] = req.body.longURL;
-    res.redirect('/urls/' + id);
-    console.log(urlDatabase);
+    let shortURL = generateRandomString();
+    let longURL = req.body.longURL;
+    let urlTemplate = {
+        userId: users[req.cookies.user_id].id,
+        longURL: longURL
+      }
+      urlDatabase[shortURL] = urlTemplate;
+    res.redirect('/urls/${shortURL}');
 });
 
 // ------------------------------- New URL Page
 
 app.get("/urls/new", (req, res) => {
-    for (let user in users) {
-        if (users[req.cookies["user_id"]] === users[user]) {
+    for (let key in users) {
+        if (users[req.cookies["user_id"]] === users[key]) {
             let templateVars = {
                 user: users[req.cookies["user_id"]]
             };
@@ -103,12 +107,16 @@ app.get("/urls/new", (req, res) => {
 //------------------------------- Short URL Page
 
 app.get("/urls/:id", (req, res) => {
-    let templateVars = {
-        longURL: urlDatabase[req.params.id],
-        shortURL: req.params.id,
-        user: users[req.cookies["user_id"]]
-    };
-    res.render("urls_show", templateVars);
+    if (req.params.id in urlDatabase) {
+        let templateVars = {
+            shortURL: req.params.id,
+            longURL: urlDatabase[req.params.id].longURL,
+            user: users[req.cookies["user_id"]]
+        };
+        res.render("urls_show", templateVars);
+    } else {
+        res.render("urls_new");
+    }
 });
 
 //----------------------------- deletes the linked page
@@ -126,16 +134,14 @@ app.post("/urls/:id/update", (req, res) => {
 })
 //when we get the new id we redirect to new
 app.post("/urls/:id", (req, res) => {
-    res.redirect('/urls/new');
+    urlDatabase[req.params.id].longURL = longURLUpdated; 
+    res.redirect('/urls/${req.params.id}');
 })
 
 
 // -------------------------------- Reads the short URL
 app.get("/u/:shortURL", (req, res) => {
-
-    let shortURL = req.params.shortURL;
-    console.log(shortURL);
-    let longURL = urlDatabase[shortURL];
+    let longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
 });
 
@@ -201,7 +207,7 @@ app.post("/login", (req, res) => {
 // -----------------------------logout 
 app.post("/logout", (req, res) => {
     res.clearCookie("user_id");
-    res.redirect('/urls')
+    res.redirect('/')
 })
 
 //------------------------------Loads the app 
