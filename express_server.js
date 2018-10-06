@@ -70,11 +70,16 @@ app.get("/urls.json", (req, res) => {
 //------------------------------- Reads page
 
 app.get("/urls", (req, res) => {
-    let templateVars = {
-        urls: urlDatabase,
-        user: users[req.cookies["user_id"]]
-    };
-    res.render("urls_index", templateVars);
+    if (req.cookies["user_id"]) {
+        let templateVars = {
+            urls: urlDatabase,
+            user: users[req.cookies["user_id"]]
+        };
+        res.render("urls_index", templateVars);
+        return;
+    } else {
+        res.send("Please login or register")
+    }
 })
 
 //------------------------------- Random URL to database 
@@ -84,8 +89,8 @@ app.post("/urls", (req, res) => {
     let urlTemplate = {
         userId: users[req.cookies.user_id].id,
         longURL: longURL
-      }
-      urlDatabase[shortURL] = urlTemplate;
+    }
+    urlDatabase[shortURL] = urlTemplate;
     res.redirect('/urls/${shortURL}');
 });
 
@@ -134,7 +139,7 @@ app.post("/urls/:id/update", (req, res) => {
 })
 //when we get the new id we redirect to new
 app.post("/urls/:id", (req, res) => {
-    urlDatabase[req.params.id].longURL = longURLUpdated; 
+    urlDatabase[req.params.id].longURL = longURLUpdated;
     res.redirect('/urls/${req.params.id}');
 })
 
