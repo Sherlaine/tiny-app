@@ -23,9 +23,16 @@ const users = {
 }
 
 //--------------------------databases
-var urlDatabase = {
-    "b2xVn2": "http://www.lighthouselabs.ca",
-    "9sm5xK": "http://www.google.com"
+let urlDatabase = {
+    "b2xVn2": {
+        userId: "userRandomID"
+        longURL: "http://www.lighthouselabs.ca",
+    },
+
+    "9sm5xK": {
+        userId: "userRandomID2",
+        longURL: "http://www.google.com",
+    }
 };
 
 // ---------------------------------body parser 
@@ -158,14 +165,14 @@ app.post("/register", (req, res) => {
         res.status(400).send("Please supply email and password");
         return;
     }
-// adds the new user
+    // adds the new user
     users[newUserID] = {
         id: newUserID,
         email: email,
         password: password
     }
- 
-// new cookie for user 
+
+    // new cookie for user 
     res.cookie("user_id", newUserID);
     console.log(users)
     res.redirect('/urls')
