@@ -5,18 +5,19 @@
 <body class="container">
         <% include partials/_header %>
     <h1>
-        URLS
+        Your URLS
     </h1>
     <ul>
         <% for (const shortURL in urls){ %>
         <li>           
             <%= shortURL%>  
-            <a href =<%=urls[shortURL]%>><%= urls[shortURL]%> </a>
-        <a href ="/urls/<%=shortURL%>" >Edit</a> 
-        <form method= "POST" action="/urls/<%= shortURL %>/delete">
-            <br>
-        <button type = "submit">Delete</button>
-        </form>
+            <a href =<%=urls[shortURL]%>><%= urls[shortURL]%></a>
+            <a href ="/urls/<%=shortURL%>" >Edit</a> 
+
+            <form method= "POST" action="/urls/<%= shortURL %>/delete">
+                <br>
+            <button type = "submit">Delete</button>
+            </form>
         </li>
       
         <% } %>

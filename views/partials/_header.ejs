@@ -1,18 +1,11 @@
 
-<a href='/register'>register</a>
-
-<% if(users){ %>
-    <p><%= users["email"] %></p>
+<% if(user){ %>
+    <p><%= user.email %></p>
     <form method="POST" action="/logout">
         <button type="submit">Logout</button>
     </form>
-  <% } else{ %>  
-    <form method="POST" action="/login">
-        <input type="text" placeholder="login" style="width: 300px" name="user_id">
-        <button type="submit">Login</button>
-    </form>
- <% } %>
-
-            
-
-   
+<% } else { %>  
+    <div>You are not logged in!</div>
+    <a href='/register'>Register</a>
+    <a href='/login'>Login</a>
+<% } %>
