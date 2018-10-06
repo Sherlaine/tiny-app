@@ -19,11 +19,13 @@ const users = {
     }
 }
 
-/////////--------------------------databases
+//--------------------------databases
 var urlDatabase = {
     "b2xVn2": "http://www.lighthouselabs.ca",
     "9sm5xK": "http://www.google.com"
 };
+
+// ---------------------------------body parser 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({
     extended: true
@@ -67,13 +69,6 @@ app.get("/urls", (req, res) => {
     res.render("urls_index", templateVars);
 })
 
-app.get("/urls/new", (req, res) => {
-    let templateVars = {
-        user: users[req.cookies["user_id"]]
-    }
-    res.render("urls_index", templateVars)
-});
-
 //on our main url page, generates a new random id when we create a different page
 app.post("/urls", (req, res) => {
     var id = generateRandomString();
@@ -97,6 +92,20 @@ app.get("/urls/:id", (req, res) => {
     res.render("urls_show", templateVars);
 });
 
+// -------------------------------New URL Page
+
+app.get("/urls/new", (req, res) => {
+    for (let user in users) {
+        if (users[req.cookies["user_id"]] === users[user]) {
+            let templateVars = {
+                user: users[req.cookies["user_id"]]
+            };
+            res.render("urls_new", templateVars);
+            return;
+        }
+    }
+    res.redirect("/login");
+});
 
 
 //when we get the new id we redirect to new
@@ -181,7 +190,7 @@ app.post("/login", (req, res) => {
     res.status(403).send("Password and email not valid");
 });
 
-
+// -----------------------------logout 
 app.post("/logout", (req, res) => {
     res.clearCookie("user_id");
     res.redirect('/urls')
