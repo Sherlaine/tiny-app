@@ -2,13 +2,13 @@ let express = require("express");
 let app = express();
 let PORT = 8080; // default port 8080
 let cookieParser = require('cookie-parser')
-
-
-app.set("view engine", "ejs");
+const bcrypt = require('bcrypt');
 
 app.use(cookieParser())
+app.set("view engine", "ejs");
 
-//-------------------------------users
+
+//-------------------------------> Users
 const users = {
     "userRandomID": {
         id: "userRandomID",
@@ -22,7 +22,7 @@ const users = {
     }
 }
 
-//--------------------------databases
+//--------------------------> Databases
 let urlDatabase = {
     "b2xVn2": {
         userId: "userRandomID",
@@ -35,14 +35,14 @@ let urlDatabase = {
     }
 };
 
-// ---------------------------------body parser 
+// ---------------------------------> Body parser 
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({
     extended: true
 
 }));
 
-//----------this if for our random string generator
+//-----------------------------> random string generator
 function generateRandomString() {
     //Solution from https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
     let text = '';
@@ -55,7 +55,7 @@ function generateRandomString() {
 }
 
 
-// ---------------------------- Paths 
+// ----------------------------> Paths 
 app.get("/", (req, res) => {
     res.redirect('/login');
 });
@@ -67,7 +67,7 @@ app.get("/urls.json", (req, res) => {
 });
 
 
-//------------------------------- Reads page
+//-------------------------------> Main page
 
 app.get("/urls", (req, res) => {
     if (req.cookies["user_id"]) {
@@ -82,7 +82,7 @@ app.get("/urls", (req, res) => {
     }
 })
 
-//------------------------------- Random URL to database 
+//-------------------------------> Random URL to database 
 app.post("/urls", (req, res) => {
     let shortURL = generateRandomString();
     let longURL = req.body.longURL;
@@ -94,7 +94,7 @@ app.post("/urls", (req, res) => {
     res.redirect('/urls/${shortURL}');
 });
 
-// ------------------------------- New URL Page
+// -------------------------------> New URL Page
 
 app.get("/urls/new", (req, res) => {
     for (let key in users) {
@@ -109,7 +109,7 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/login");
 });
 
-//------------------------------- Short URL Page
+//-------------------------------> Short URL Page
 
 app.get("/urls/:id", (req, res) => {
     if (req.params.id in urlDatabase) {
@@ -124,13 +124,13 @@ app.get("/urls/:id", (req, res) => {
     }
 });
 
-//----------------------------- deletes the linked page
+//-----------------------------> Deletes the linked page
 app.post("/urls/:id/delete", (req, res) => {
     delete urlDatabase[req.params.id]
     res.redirect('/urls/');
 })
 
-// -------------------------------Updates the short URL
+// ------------------------------> Updates the short URL
 app.post("/urls/:id/update", (req, res) => {
     var shortURL = req.params.id
     urlDatabase[shortURL] = req.body.newLongURL;
@@ -144,78 +144,80 @@ app.post("/urls/:id", (req, res) => {
 })
 
 
-// -------------------------------- Reads the short URL
+// --------------------------------> Reads the short URL
 app.get("/u/:shortURL", (req, res) => {
     let longURL = urlDatabase[req.params.shortURL].longURL;
     res.redirect(longURL);
 });
 
 
-//------------------------ Registration page
+//------------------------> Registration page
 app.get("/register", (req, res) => {
-
     res.render('register');
 })
 
 app.post("/register", (req, res) => {
-    //assigning our email and password variable with the user's inuput of email and password
-    let email = req.body.email;
-    let password = req.body.password;
-    let newUserID = generateRandomString();
+     //assigning our email and password variable with the user's inuput of email and password
+     let email = req.body.email;
+     let password = req.body.password;
+     let hashedPassword = bcrypt.hashSync(password, 10)
+     let newUserID = generateRandomString();
+ 
+     //we are making a newUSER ID by generating a random string 
+     for (let property in users) {
+         let user = user[property];
+         if (email === users[property].email) {
+             res.status(400).send("Existing user email, please register")
+             return;
+         }
+     }
+ 
+     if (!email || !password) {
+         console.log("400 need something in here")
+         res.status(400).send("Please supply email and password");
+         return;
+     }
+// adds the new user
+users[newUserID] = {
+    id: newUserID,
+    email: email,
+    password: hashedPassword
+}
 
-    //we are making a newUSER ID by generating a random string 
-    for (let property in users) {
-        if (email === users[property].email) {
-            res.status(400).send("Existing user email, please register")
-            return;
-        }
-    }
-
-    if (!email || !password) {
-        console.log("400 need something in here")
-        res.status(400).send("Please supply email and password");
-        return;
-    }
-    // adds the new user
-    users[newUserID] = {
-        id: newUserID,
-        email: email,
-        password: password
-    }
-
-    // new cookie for user 
-    res.cookie("user_id", newUserID);
-    console.log(users)
-    res.redirect('/urls')
+// new cookie for user 
+res.cookie("user_id", newUserID); 
+res.redirect('/urls')
 })
 
-//--------------------------------login 
+//--------------------------------> Login 
 
 app.get("/login", (req, res) => {
     res.render("login");
 });
 
 app.post("/login", (req, res) => {
-    let email = req.body.email;
-    let password = req.body.password;
+    let loginEmail = req.body.email;
+    let loginPassword = req.body.password;
     for (let object in users) {
         const user = users[object];
-        if (email && user.email === email && user.password === password) {
+        if (loginEmail && user.email === loginEmail && bcrypt.compareSync(user.password) === loginPassword) {
             res.cookie("user_id", user.id);
             res.redirect("/urls");
             return;
         }
     }
+
     res.status(403).send("Password and email not valid");
 });
 
-// -----------------------------logout 
+// -----------------------------> Logout 
 app.post("/logout", (req, res) => {
     res.clearCookie("user_id");
+    console.log("Logout successful");
     res.redirect('/')
 })
 
-//------------------------------Loads the app 
+//------------------------------> Loads the app 
 
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}!`);
