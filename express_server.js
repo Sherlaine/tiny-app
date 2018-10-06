@@ -1,11 +1,14 @@
-const express = require("express");
-const app = express();
-const PORT = 8080; // default port 8080
+let express = require("express");
+let app = express();
+let PORT = 8080; // default port 8080
+let cookieParser = require('cookie-parser')
+
+
 app.set("view engine", "ejs");
-const cookieParser = require('cookie-parser')
+
 app.use(cookieParser())
 
-//-------------------------------user objects 
+//-------------------------------users
 const users = {
     "userRandomID": {
         id: "userRandomID",
@@ -35,31 +38,29 @@ app.use(bodyParser.urlencoded({
 //----------this if for our random string generator
 function generateRandomString() {
     //Solution from https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
-    var text = '';
-    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
+    let text = '';
+    let possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyz";
 
-    for (var i = 0; i < 6; i++) {
+    for (let i = 0; i < 6; i++) {
         text += possible.charAt(Math.floor(Math.random() * possible.length));
     }
     return text;
 }
 
 
-
+// ---------------------------- Paths 
 app.get("/", (req, res) => {
     res.redirect('/urls');
 });
 
-app.listen(PORT, () => {
-    console.log(`Example app listening on port ${PORT}!`);
-});
+
 
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
 });
 
 
-//-------------------------------urls index
+//------------------------------- Reads page
 
 app.get("/urls", (req, res) => {
     let templateVars = {
@@ -69,7 +70,7 @@ app.get("/urls", (req, res) => {
     res.render("urls_index", templateVars);
 })
 
-//on our main url page, generates a new random id when we create a different page
+//------------------------------- Random URL to database 
 app.post("/urls", (req, res) => {
     var id = generateRandomString();
     urlDatabase[id] = req.body.longURL;
@@ -77,22 +78,7 @@ app.post("/urls", (req, res) => {
     console.log(urlDatabase);
 });
 
-// deletes the linked page
-app.post("/urls/:id/delete", (req, res) => {
-    delete urlDatabase[req.params.id]
-    res.redirect('/urls/');
-})
-
-app.get("/urls/:id", (req, res) => {
-    let templateVars = {
-        longURL: urlDatabase[req.params.id],
-        shortURL: req.params.id,
-        user: users[req.cookies["user_id"]]
-    };
-    res.render("urls_show", templateVars);
-});
-
-// -------------------------------New URL Page
+// ------------------------------- New URL Page
 
 app.get("/urls/new", (req, res) => {
     for (let user in users) {
@@ -107,20 +93,37 @@ app.get("/urls/new", (req, res) => {
     res.redirect("/login");
 });
 
+//------------------------------- Short URL Page
 
-//when we get the new id we redirect to new
-app.post("/urls/:id", (req, res) => {
-    res.redirect('/urls/new');
+app.get("/urls/:id", (req, res) => {
+    let templateVars = {
+        longURL: urlDatabase[req.params.id],
+        shortURL: req.params.id,
+        user: users[req.cookies["user_id"]]
+    };
+    res.render("urls_show", templateVars);
+});
+
+//----------------------------- deletes the linked page
+app.post("/urls/:id/delete", (req, res) => {
+    delete urlDatabase[req.params.id]
+    res.redirect('/urls/');
 })
 
+// -------------------------------Updates the short URL
 app.post("/urls/:id/update", (req, res) => {
     var shortURL = req.params.id
     urlDatabase[shortURL] = req.body.newLongURL;
     res.redirect('/urls');
     //we are updating the the request link long URL 
 })
+//when we get the new id we redirect to new
+app.post("/urls/:id", (req, res) => {
+    res.redirect('/urls/new');
+})
 
 
+// -------------------------------- Reads the short URL
 app.get("/u/:shortURL", (req, res) => {
 
     let shortURL = req.params.shortURL;
@@ -130,8 +133,7 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 
-
-//------------------registration page
+//------------------------ Registration page
 app.get("/register", (req, res) => {
 
     res.render('register');
@@ -156,15 +158,14 @@ app.post("/register", (req, res) => {
         res.status(400).send("Please supply email and password");
         return;
     }
-
+// adds the new user
     users[newUserID] = {
         id: newUserID,
         email: email,
         password: password
     }
-
-    // we need to add these variables to our user object however, we can't push so we are making a new object. 
-
+ 
+// new cookie for user 
     res.cookie("user_id", newUserID);
     console.log(users)
     res.redirect('/urls')
@@ -195,3 +196,9 @@ app.post("/logout", (req, res) => {
     res.clearCookie("user_id");
     res.redirect('/urls')
 })
+
+//------------------------------Loads the app 
+
+app.listen(PORT, () => {
+    console.log(`Example app listening on port ${PORT}!`);
+});
