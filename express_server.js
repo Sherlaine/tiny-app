@@ -1,10 +1,24 @@
 let express = require("express");
 let app = express();
 let PORT = 8080; // default port 8080
-let cookieParser = require('cookie-parser')
+let cookieSession = require('cookie-session');
+let cookiePaser = require('cookie-parser')
 const bcrypt = require('bcrypt');
 
-app.use(cookieParser())
+// app.use(cookieParser())
+
+// ---------------------------------> Body parser 
+const bodyParser = require("body-parser");
+app.use(bodyParser.urlencoded({
+    extended: true
+
+}));
+
+app.use(cookieSession({
+    name: "session",
+    keys: ["blah blah blah"],
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+}))
 app.set("view engine", "ejs");
 
 
@@ -13,13 +27,14 @@ const users = {
     "userRandomID": {
         id: "userRandomID",
         email: "user@example.com",
-        password: "1"
+        password: bcrypt.hashSync("1", 10)
     },
     "user2RandomID": {
         id: "user2RandomID",
         email: "user2@example.com",
-        password: "1"
+        password: bcrypt.hashSync("1", 10)
     }
+    // had to change password to the bcrypt function because it will not know the hardcoded one anymore    
 }
 
 //--------------------------> Databases
@@ -35,12 +50,7 @@ let urlDatabase = {
     }
 };
 
-// ---------------------------------> Body parser 
-const bodyParser = require("body-parser");
-app.use(bodyParser.urlencoded({
-    extended: true
 
-}));
 
 //-----------------------------> random string generator
 function generateRandomString() {
@@ -70,10 +80,10 @@ app.get("/urls.json", (req, res) => {
 //-------------------------------> Main page
 
 app.get("/urls", (req, res) => {
-    if (req.cookies["user_id"]) {
+    if (req.session["user_id"]) {
         let templateVars = {
             urls: urlDatabase,
-            user: users[req.cookies["user_id"]]
+            user: users[req.session["user_id"]]
         };
         res.render("urls_index", templateVars);
         return;
@@ -87,7 +97,7 @@ app.post("/urls", (req, res) => {
     let shortURL = generateRandomString();
     let longURL = req.body.longURL;
     let urlTemplate = {
-        userId: users[req.cookies.user_id].id,
+        userId: users[req.session.user_id].id,
         longURL: longURL
     }
     urlDatabase[shortURL] = urlTemplate;
@@ -98,9 +108,9 @@ app.post("/urls", (req, res) => {
 
 app.get("/urls/new", (req, res) => {
     for (let key in users) {
-        if (users[req.cookies["user_id"]] === users[key]) {
+        if (users[req.session["user_id"]] === users[key]) {
             let templateVars = {
-                user: users[req.cookies["user_id"]]
+                user: users[req.session["user_id"]]
             };
             res.render("urls_new", templateVars);
             return;
@@ -116,7 +126,7 @@ app.get("/urls/:id", (req, res) => {
         let templateVars = {
             shortURL: req.params.id,
             longURL: urlDatabase[req.params.id].longURL,
-            user: users[req.cookies["user_id"]]
+            user: users[req.session["user_id"]]
         };
         res.render("urls_show", templateVars);
     } else {
@@ -157,36 +167,36 @@ app.get("/register", (req, res) => {
 })
 
 app.post("/register", (req, res) => {
-     //assigning our email and password variable with the user's inuput of email and password
-     let email = req.body.email;
-     let password = req.body.password;
-     let hashedPassword = bcrypt.hashSync(password, 10)
-     let newUserID = generateRandomString();
- 
-     //we are making a newUSER ID by generating a random string 
-     for (let property in users) {
-         let user = user[property];
-         if (email === users[property].email) {
-             res.status(400).send("Existing user email, please register")
-             return;
-         }
-     }
- 
-     if (!email || !password) {
-         console.log("400 need something in here")
-         res.status(400).send("Please supply email and password");
-         return;
-     }
-// adds the new user
-users[newUserID] = {
-    id: newUserID,
-    email: email,
-    password: hashedPassword
-}
+    //assigning our email and password variable with the user's inuput of email and password
+    let email = req.body.email;
+    let password = req.body.password;
+    let newUserID = generateRandomString();
 
-// new cookie for user 
-res.cookie("user_id", newUserID); 
-res.redirect('/urls')
+    //we are making a newUSER ID by generating a random string 
+    for (let property in users) {
+        if (email === users[property].email) {
+            res.status(400).send("Existing user email, please register")
+            return;
+        }
+    }
+
+    if (!email || !password) {
+        console.log("400 need something in here")
+        res.status(400).send("Please supply email and password");
+        return;
+    }
+    let hashedPassword = bcrypt.hashSync(password, 10)
+
+    // adds the new user
+    users[newUserID] = {
+        id: newUserID,
+        email: email,
+        password: hashedPassword
+    }
+
+    // new cookie for user 
+    req.session["user_id"] = newUserID;
+    res.redirect('/urls')
 })
 
 //--------------------------------> Login 
@@ -200,8 +210,11 @@ app.post("/login", (req, res) => {
     let loginPassword = req.body.password;
     for (let object in users) {
         const user = users[object];
-        if (loginEmail && user.email === loginEmail && bcrypt.compareSync(user.password) === loginPassword) {
-            res.cookie("user_id", user.id);
+        console.log("hey you look here!", user)
+        console.log("bcrypt being fix yo!", bcrypt.compareSync(loginPassword, user.password))
+        console.log("email problem?", loginEmail && user.email === loginEmail && bcrypt.compareSync(loginPassword, user.password))
+        if (loginEmail && user.email === loginEmail && bcrypt.compareSync(loginPassword, user.password)) {
+            req.session["user_id"] = user.id;
             res.redirect("/urls");
             return;
         }
@@ -212,7 +225,7 @@ app.post("/login", (req, res) => {
 
 // -----------------------------> Logout 
 app.post("/logout", (req, res) => {
-    res.clearCookie("user_id");
+    req.session = null;
     console.log("Logout successful");
     res.redirect('/')
 })
