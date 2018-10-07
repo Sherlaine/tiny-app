@@ -1,0 +1,59 @@
+body {
+    background: url(/assets/bird.jpg); 
+    font-family: helvetica;
+    color: #fff;
+    text-align: center;
+    max-width: 100%;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
+  }
+  h1 {
+    text-align: center;
+    letter-spacing: 1px;
+    font-size: 3em;
+  }
+
+
+button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+}
+a:hover, a:active {
+    background-color: grey; 
+}
+  /* unvisited link */
+a:link {
+    color:white;
+}
+
+/* visited link */
+a:visited {
+    color:grey;
+}
+
+/* mouse over link */
+a:hover {
+    color: black;
+}
+
+button {
+    background-color: transparent;
+    color: white;
+    border: 2px solid #e7e7e7;
+}
+  
+input {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    box-sizing: border-box;
+}

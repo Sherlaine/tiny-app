@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+<% include partials/_head %>
 
-<head></head>
-<h1>Make a new URL</h1>
 
 <body style="font-size:20px; padding:50px;">
-    <% include partials/_header %>
+  <% include partials/_header %>
+  <h1>Make a new URL</h1>
+
   <form action="/urls" method="POST" style="margin:150px;">
     <label for="longURL">Enter a URL:</label>
     <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
-    <input type="submit" value="Submit">
-  </form>
+    <button type="submit">Submit</button> </form>
 </body>
-
 </html>

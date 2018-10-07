@@ -4,15 +4,13 @@
 
 <body class="container">
     <% include partials/_header %>
-    <h1>
-        Your URLS
-    </h1>
+    <h1>Your URLS</h1>
     <ul>
         <% for (let key in urls){ %>
         <% if (urls[key.userId === user.id]) { %>
-        <li>
         <li><strong>
-                <%= key %>: </strong>
+            <%= key %>:
+            </strong>
             <%= urls[key].longURL %>
         </li>
 
@@ -22,14 +20,11 @@
 
         <form method="POST" action="/urls/<%= key %>/delete"> <input type="submit" value="Delete" class="btn btn-default">
         </form>
-        
 
         <% } %>
         <%}%>
-    <li>
-            <a href="/urls/new">Create new link</a>
-    </li>
     </ul>
+    <a href="/urls/new">Create new link</a>
 
 </body>
 

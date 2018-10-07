@@ -2,10 +2,9 @@ let express = require("express");
 let app = express();
 let PORT = 8080; // default port 8080
 let cookieSession = require('cookie-session');
-let cookiePaser = require('cookie-parser')
 const bcrypt = require('bcrypt');
 
-// app.use(cookieParser())
+
 
 // ---------------------------------> Body parser 
 const bodyParser = require("body-parser");
@@ -17,12 +16,15 @@ app.use(bodyParser.urlencoded({
 app.use(cookieSession({
     name: "session",
     keys: ["whatever you want"],
-    maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000 // 24 hour expiration
 }))
+
+//---------------------------------> Configure 
 app.set("view engine", "ejs");
+app.use("/assets", express.static("assets"));
 
 
-//-------------------------------> Users
+//-------------------------------> User examples
 const users = {
     "userRandomID": {
         id: "userRandomID",
@@ -34,10 +36,10 @@ const users = {
         email: "user2@example.com",
         password: bcrypt.hashSync("1", 10)
     }
-    // had to change password to the bcrypt function because it will not know the hardcoded one anymore    
+    // had to change password to the bcrypt function because it will not know the hardcoded ones anymore    
 }
 
-//--------------------------> Databases
+//--------------------------> Databases examples
 let urlDatabase = {
     "b2xVn2": {
         userId: "userRandomID",
@@ -52,7 +54,7 @@ let urlDatabase = {
 
 
 
-//-----------------------------> random string generator
+//-----------------------------> random string function
 function generateRandomString() {
     //Solution from https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
     let text = '';
@@ -70,8 +72,6 @@ app.get("/", (req, res) => {
     res.redirect('/login');
 });
 
-
-
 app.get("/urls.json", (req, res) => {
     res.json(urlDatabase);
 });
@@ -86,7 +86,6 @@ app.get("/urls", (req, res) => {
             user: users[req.session["user_id"]]
         };
         res.render("urls_index", templateVars);
-        return;
     } else {
         res.send("Please login or register")
     }
@@ -172,7 +171,7 @@ app.post("/register", (req, res) => {
     let password = req.body.password;
     let newUserID = generateRandomString();
 
-    //we are making a newUSER ID by generating a random string 
+    //functions to validate user's email and password
     for (let property in users) {
         if (email === users[property].email) {
             res.status(400).send("Existing user email, please register")
@@ -210,9 +209,6 @@ app.post("/login", (req, res) => {
     let loginPassword = req.body.password;
     for (let object in users) {
         const user = users[object];
-        console.log("hey you look here!", user)
-        console.log("bcrypt being fix yo!", bcrypt.compareSync(loginPassword, user.password))
-        console.log("email problem?", loginEmail && user.email === loginEmail && bcrypt.compareSync(loginPassword, user.password))
         if (loginEmail && user.email === loginEmail && bcrypt.compareSync(loginPassword, user.password)) {
             req.session["user_id"] = user.id;
             res.redirect("/urls");

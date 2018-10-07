@@ -1,28 +1,29 @@
 <!DOCTYPE html>
 <html lang="en">
-        <% include partials/_head %>
-
-
+<% include partials/_head %>
 
 <body class="container">
+    <% include partials/_header %>
+    <h1>Shortened URLS</h1>
 
-        <% include partials/_header %>
-    <h1>
-        Show my URLS
-    </h1>
-    <ol>
-        <a href=>
-            <li>
-                Link:
-                <%= longURL%>
-            </li>
+    <li><strong>Shortened:</strong>
+        <a href="/u/<%= shortURL %>">
+            <%= shortURL %>
         </a>
- <!-- this is the url update form  -->
-        <form method="POST" action="/urls/<%=shortURL%>/update">
-            <input type="text" placeholder="http://" style="width: 300px" name="newLongURL">
-            <button type="submit">Update</button>
-        </form>
-    </ol>
+    </li>
+
+    <a href=>
+        <li><strong>Long URL</strong>
+            <%= longURL%>
+        </li>
+    </a>
+    
+    <!-- this is the url update form  -->
+    <form method="POST" action="/urls/<%=shortURL%>/update">
+        <input id="longURLUpdated" type="text" placeholder="http://" style="width: 300px" name="newLongURL">
+        <button type="submit">Update</button>
+    </form>
+
 
 </body>
 
