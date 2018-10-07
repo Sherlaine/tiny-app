@@ -16,7 +16,7 @@ app.use(bodyParser.urlencoded({
 
 app.use(cookieSession({
     name: "session",
-    keys: ["blah blah blah"],
+    keys: ["whatever you want"],
     maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }))
 app.set("view engine", "ejs");
