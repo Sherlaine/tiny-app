@@ -36,7 +36,7 @@ const users = {
         email: "user2@example.com",
         password: bcrypt.hashSync("1", 10)
     }
-    // had to change password to the bcrypt function because it will not know the hardcoded ones anymore    
+     
 }
 
 //--------------------------> Databases examples
@@ -87,7 +87,7 @@ app.get("/urls", (req, res) => {
         };
         res.render("urls_index", templateVars);
     } else {
-        res.send("Please login or register")
+        res.send("Please login or register");
     }
 })
 
@@ -135,18 +135,17 @@ app.get("/urls/:id", (req, res) => {
 
 //-----------------------------> Deletes the linked page
 app.post("/urls/:id/delete", (req, res) => {
-    delete urlDatabase[req.params.id]
+    delete urlDatabase[req.params.id];
     res.redirect('/urls/');
 })
 
 // ------------------------------> Updates the short URL
 app.post("/urls/:id/update", (req, res) => {
-    var shortURL = req.params.id
+    var shortURL = req.params.id;
     urlDatabase[shortURL] = req.body.newLongURL;
     res.redirect('/urls');
-    //we are updating the the request link long URL 
 })
-//when we get the new id we redirect to new
+
 app.post("/urls/:id", (req, res) => {
     urlDatabase[req.params.id].longURL = longURLUpdated;
     res.redirect('/urls/${req.params.id}');
@@ -166,7 +165,6 @@ app.get("/register", (req, res) => {
 })
 
 app.post("/register", (req, res) => {
-    //assigning our email and password variable with the user's inuput of email and password
     let email = req.body.email;
     let password = req.body.password;
     let newUserID = generateRandomString();
@@ -174,13 +172,12 @@ app.post("/register", (req, res) => {
     //functions to validate user's email and password
     for (let property in users) {
         if (email === users[property].email) {
-            res.status(400).send("Existing user email, please register")
+            res.status(400).send("Existing user email, please register");
             return;
         }
     }
 
     if (!email || !password) {
-        console.log("400 need something in here")
         res.status(400).send("Please supply email and password");
         return;
     }
@@ -195,7 +192,7 @@ app.post("/register", (req, res) => {
 
     // new cookie for user 
     req.session["user_id"] = newUserID;
-    res.redirect('/urls')
+    res.redirect('/urls');
 })
 
 //--------------------------------> Login 
@@ -223,7 +220,7 @@ app.post("/login", (req, res) => {
 app.post("/logout", (req, res) => {
     req.session = null;
     console.log("Logout successful");
-    res.redirect('/')
+    res.redirect('/');
 })
 
 //------------------------------> Loads the app 

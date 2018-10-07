@@ -1,10 +1,10 @@
-# TinyApp Project
+# TinyApp Project - Space Landing
 
 
-TinyApp: url shortener project is a full stack web application built with Node and Express that allows users to shorten long URLs. 
+TinyApp is a full stack web application built with Node and Express that allows users to shorten long URLs. Now let's login to our space landing account!  
 
-## Final Product
-!["Screenshot of register page"](https://github.com/Sherlaine/tiny-app/blob/master/assets/screenshots/1.%20register.png)
+## Final Product - Space Landing
+!["Screenshot of Register page"](https://github.com/Sherlaine/tiny-app/blob/master/assets/screenshots/1.%20register.png)
 !["Screenshot of Login page"](https://github.com/Sherlaine/tiny-app/blob/master/assets/screenshots/2.%20login.png)
 !["Screenshot of Main page"](https://github.com/Sherlaine/tiny-app/blob/master/assets/screenshots/3.%20urls_index.png)
 !["Screenshot of New URLS page"](https://github.com/Sherlaine/tiny-app/blob/master/assets/screenshots/4.%20urls_new.png)
