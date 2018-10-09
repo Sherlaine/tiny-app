@@ -1,10 +1,15 @@
 <% if(user){ %>
-    <p><%= user.email %></p>
-    <form method="POST" action="/logout">
-        <button type="submit">Logout</button>
-    </form>
-<% } else { %>  
-    <div>You are not logged in!</div>
-    <a href='/register'>Register</a>
-    <a href='/login'>Login</a>
+<p>
+    <%= user.email %>
+</p>
+
+<form method="POST" action="/logout">
+    <button type="submit">Logout</button>
+</form>
+
+<% } else { %>
+    
+<div>You are not logged in!</div>
+<a href='/register'>Register</a>
+<a href='/login'>Login</a>
 <% } %>

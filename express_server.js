@@ -156,9 +156,9 @@ app.post("/urls/:id/update", (req, res) => {
 
 // --------------------------------> Reads the short URL
 app.get("/u/:shortURL", (req, res) => {
-        if (req.params.shortURL in urlDatabase){
-            let longURL = urlDatabase[req.params.shortURL].longURL;
-            res.redirect(longURL);
+    if (req.params.shortURL in urlDatabase) {
+        let longURL = urlDatabase[req.params.shortURL].longURL;
+        res.redirect(longURL);
     } else {
         res.status(400);
         res.send("Please login or register");

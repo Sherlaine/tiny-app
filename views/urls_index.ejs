@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="en">
 <% include partials/_head %>
+<title>Your Account</title>
 
 <body class="container">
     <% include partials/_header %>
     <h1>Your URLS</h1>
-        <% for (let shorturl in urls) { %>
-        <% if (urls[shorturl].userId === user.id) { %>
-        <strong>
-            <%= shorturl %>:
-        </strong>
-        <%= urls[shorturl].longURL %>
+    <% for (let shorturl in urls) { %>
+    <% if (urls[shorturl].userId === user.id) { %>
+    <strong>
+        <%= shorturl %>:
+    </strong>
+    <%= urls[shorturl].longURL %>
 
-        <form action="/urls/<%= shorturl%>">
-            <input type="submit" value="Edit" class="btn btn-default" style="width: 100px">
-        </form>
+    <form action="/urls/<%= shorturl%>">
+        <input type="submit" value="Edit" class="btn btn-default" style="width: 100px">
+    </form>
 
-        <form method="POST" action="/urls/<%= shorturl %>/delete"><input type="submit" value="Delete" class="btn btn-default" style="width: 100px">
-        </form>
+    <form method="POST" action="/urls/<%= shorturl %>/delete"><input type="submit" value="Delete" class="btn btn-default"
+            style="width: 100px">
+    </form>
 
-        <% } %>
-        <% } %>
+    <% } %>
+    <% } %>
     <a href="/urls/new">Create new link</a>
 
 </body>
