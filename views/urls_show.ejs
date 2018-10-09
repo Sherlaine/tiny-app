@@ -4,27 +4,24 @@
 
 <body class="container">
     <% include partials/_header %>
-    <h1>Shortened URLS</h1>
+    <h1>Update Long URL</h1>
 
-    <li><strong>Shortened:</strong>
-        <a href="/u/<%= shortURL %>">
-            <%= shortURL %>
-        </a>
+    <li>
+        <strong>Shortened: </strong>
+        <a href="/u/<%= shortURL %>"><%= shortURL %></a>
     </li>
-
-    <a href=>
-        <li><strong>Long URL</strong>
-            <%= longURL%>
-        </li>
-    </a>
+    
+    <li>
+    <strong>Long URL:</strong>
+    <a href="http://<%= longURL %>"><%= longURL %></a>
+    </li>
     
     <!-- this is the url update form  -->
     <form method="POST" action="/urls/<%=shortURL%>/update">
         <input id="longURLUpdated" type="text" placeholder="http://" style="width: 300px" name="newLongURL">
         <button type="submit">Update</button>
     </form>
-
-
+    <a href="/urls">See all links</a>
 </body>
 
 </html>

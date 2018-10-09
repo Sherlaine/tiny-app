@@ -36,10 +36,10 @@ const users = {
         email: "user2@example.com",
         password: bcrypt.hashSync("1", 10)
     }
-     
+
 }
 
-//--------------------------> Databases examples
+//--------------------------> Databases examples   urls.shorturl.userId
 let urlDatabase = {
     "b2xVn2": {
         userId: "userRandomID",
@@ -80,16 +80,19 @@ app.get("/urls.json", (req, res) => {
 //-------------------------------> Main page
 
 app.get("/urls", (req, res) => {
-    if (req.session["user_id"]) {
+    var user = users[req.session["user_id"]]
+    if (user !== undefined) {
         let templateVars = {
             urls: urlDatabase,
-            user: users[req.session["user_id"]]
+            user: user
         };
         res.render("urls_index", templateVars);
+        return;
     } else {
+        res.status(400);
         res.send("Please login or register");
     }
-})
+});
 
 //-------------------------------> Random URL to database 
 app.post("/urls", (req, res) => {
@@ -100,7 +103,7 @@ app.post("/urls", (req, res) => {
         longURL: longURL
     }
     urlDatabase[shortURL] = urlTemplate;
-    res.redirect('/urls/${shortURL}');
+    res.redirect(`/urls/${shortURL}`);
 });
 
 // -------------------------------> New URL Page
@@ -115,7 +118,7 @@ app.get("/urls/new", (req, res) => {
             return;
         }
     }
-    res.redirect("/login");
+    res.redirect('/login');
 });
 
 //-------------------------------> Short URL Page
@@ -129,7 +132,11 @@ app.get("/urls/:id", (req, res) => {
         };
         res.render("urls_show", templateVars);
     } else {
-        res.render("urls_new");
+        let templateVars = {
+            shortURL: req.params.id,
+            user: users[req.session["user_id"]]
+        };
+        res.redirect("urls_new", templateVars);
     }
 });
 
@@ -142,20 +149,20 @@ app.post("/urls/:id/delete", (req, res) => {
 // ------------------------------> Updates the short URL
 app.post("/urls/:id/update", (req, res) => {
     var shortURL = req.params.id;
-    urlDatabase[shortURL] = req.body.newLongURL;
+    urlDatabase[shortURL].longURL = req.body.newLongURL;
     res.redirect('/urls');
-})
-
-app.post("/urls/:id", (req, res) => {
-    urlDatabase[req.params.id].longURL = longURLUpdated;
-    res.redirect('/urls/${req.params.id}');
 })
 
 
 // --------------------------------> Reads the short URL
 app.get("/u/:shortURL", (req, res) => {
-    let longURL = urlDatabase[req.params.shortURL].longURL;
-    res.redirect(longURL);
+        if (req.params.shortURL in urlDatabase){
+            let longURL = urlDatabase[req.params.shortURL].longURL;
+            res.redirect(longURL);
+    } else {
+        res.status(400);
+        res.send("Please login or register");
+    }
 });
 
 
@@ -178,7 +185,8 @@ app.post("/register", (req, res) => {
     }
 
     if (!email || !password) {
-        res.status(400).send("Please supply email and password");
+        res.status(400);
+        res.send("Please supply email and password");
         return;
     }
     let hashedPassword = bcrypt.hashSync(password, 10)
@@ -205,7 +213,7 @@ app.post("/login", (req, res) => {
     let loginEmail = req.body.email;
     let loginPassword = req.body.password;
     for (let object in users) {
-        const user = users[object];
+        let user = users[object];
         if (loginEmail && user.email === loginEmail && bcrypt.compareSync(loginPassword, user.password)) {
             req.session["user_id"] = user.id;
             res.redirect("/urls");
@@ -213,7 +221,8 @@ app.post("/login", (req, res) => {
         }
     }
 
-    res.status(403).send("Password and email not valid");
+    res.status(403);
+    res.send("Password and email not valid");
 });
 
 // -----------------------------> Logout 

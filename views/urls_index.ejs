@@ -5,25 +5,22 @@
 <body class="container">
     <% include partials/_header %>
     <h1>Your URLS</h1>
-    <ul>
-        <% for (let key in urls){ %>
-        <% if (urls[key.userId === user.id]) { %>
-        <li><strong>
-            <%= key %>:
-            </strong>
-            <%= urls[key].longURL %>
-        </li>
+        <% for (let shorturl in urls) { %>
+        <% if (urls[shorturl].userId === user.id) { %>
+        <strong>
+            <%= shorturl %>:
+        </strong>
+        <%= urls[shorturl].longURL %>
 
-        <form action="/urls/<%= key%>">
-            <input type="submit" value="Edit" class="btn btn-default">
+        <form action="/urls/<%= shorturl%>">
+            <input type="submit" value="Edit" class="btn btn-default" style="width: 100px">
         </form>
 
-        <form method="POST" action="/urls/<%= key %>/delete"> <input type="submit" value="Delete" class="btn btn-default">
+        <form method="POST" action="/urls/<%= shorturl %>/delete"><input type="submit" value="Delete" class="btn btn-default" style="width: 100px">
         </form>
 
         <% } %>
-        <%}%>
-    </ul>
+        <% } %>
     <a href="/urls/new">Create new link</a>
 
 </body>
